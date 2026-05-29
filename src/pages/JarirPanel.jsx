@@ -21,9 +21,25 @@ const TABS = [
 ]
 
 const PROJECT_TYPES = ['open-source', 'private', 'pentest']
+const REPO_EDIT_BASE = 'https://github.com/jarir2020/jarir2020.github.io/edit/main'
 
 function slugify(s) {
   return (s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+}
+
+function EditWorkflowBanner({ filePath, fileLabel }) {
+  return (
+    <div className="rounded-md border border-brand-200 bg-brand-50 dark:border-brand-800 dark:bg-brand-900/20 p-3 text-sm text-brand-900 dark:text-brand-100">
+      <p className="font-semibold mb-1">How saving works</p>
+      <ol className="list-decimal list-inside text-xs space-y-0.5 text-brand-900/80 dark:text-brand-100/80">
+        <li>Edit the fields below.</li>
+        <li>Click <strong>Save</strong> — your browser downloads <code>{fileLabel}</code>.</li>
+        <li>Open <a href={`${REPO_EDIT_BASE}/${filePath}`} target="_blank" rel="noreferrer noopener"
+              className="underline font-medium">{filePath} on GitHub</a>, replace its content with the downloaded file, commit on main.</li>
+        <li>GitHub Action redeploys (~30s) — site updates automatically.</li>
+      </ol>
+    </div>
+  )
 }
 
 export default function JarirPanel() {
@@ -285,20 +301,25 @@ function ProjectsTab() {
     )
   }
 
+  const dirty = JSON.stringify(items) !== JSON.stringify(projects)
+
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-neutral-600 dark:text-neutral-400">
-          {items.length} project{items.length !== 1 ? 's' : ''} in memory
+      <EditWorkflowBanner filePath="src/data/projects.json" fileLabel="projects.json" />
+
+      <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-md bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
+        <p className="text-sm">
+          <strong>{items.length}</strong> project{items.length !== 1 ? 's' : ''}
+          {dirty && <span className="ml-2 text-amber-600 dark:text-amber-400 font-medium">● unsaved</span>}
         </p>
         <div className="flex flex-wrap gap-2">
           <button onClick={startNew}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-md text-sm font-medium">
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 rounded-md text-sm font-medium">
             <Plus size={14} /> New project
           </button>
           <button onClick={downloadAll}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-md text-sm font-medium">
-            <Download size={14} /> Download projects.json
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-md text-sm font-bold">
+            <Save size={14} /> Save (download projects.json)
           </button>
           <button onClick={resetToFile}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-neutral-500 hover:text-red-600">
@@ -485,20 +506,25 @@ function BlogTab() {
 
   const posts = [...items].sort((a, b) => (a.date < b.date ? 1 : -1))
 
+  const dirty = JSON.stringify(items) !== JSON.stringify(blog) || pendingDeletes.length > 0
+
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-neutral-600 dark:text-neutral-400">
-          {items.length} post{items.length !== 1 ? 's' : ''} in memory
+      <EditWorkflowBanner filePath="src/data/blog.json" fileLabel="blog.json (+ .md files in src/data/posts/)" />
+
+      <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-md bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
+        <p className="text-sm">
+          <strong>{items.length}</strong> post{items.length !== 1 ? 's' : ''}
+          {dirty && <span className="ml-2 text-amber-600 dark:text-amber-400 font-medium">● unsaved</span>}
         </p>
         <div className="flex flex-wrap gap-2">
           <button onClick={startNew}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-md text-sm font-medium">
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 rounded-md text-sm font-medium">
             <Plus size={14} /> New post
           </button>
           <button onClick={downloadIndex}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-md text-sm font-medium">
-            <Download size={14} /> Download blog.json
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-md text-sm font-bold">
+            <Save size={14} /> Save (download blog.json)
           </button>
           <button onClick={resetToFile}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-neutral-500 hover:text-red-600">
@@ -542,6 +568,7 @@ function BlogTab() {
 
 function ProfileTab() {
   const [data, setData] = useState(profile)
+  const dirty = JSON.stringify(data) !== JSON.stringify(profile)
 
   function update(field, value) {
     setData({ ...data, [field]: value })
@@ -551,35 +578,59 @@ function ProfileTab() {
     setData({ ...data, socials: { ...data.socials, [key]: value } })
   }
 
-  function download() {
+  function save() {
     downloadJSON('profile.json', data)
   }
 
-  return (
-    <div className="space-y-3 max-w-2xl">
-      <Field label="Name" value={data.name} onChange={(v) => update('name', v)} />
-      <Field label="Short name" value={data.shortName} onChange={(v) => update('shortName', v)} />
-      <Field label="Role" value={data.role} onChange={(v) => update('role', v)} />
-      <Field label="Location" value={data.location} onChange={(v) => update('location', v)} />
-      <Field label="Email" value={data.email} onChange={(v) => update('email', v)} />
-      <Field label="GitHub URL" value={data.socials?.github || ''} onChange={(v) => updateSocial('github', v)} />
-      <Field label="LinkedIn URL" value={data.socials?.linkedin || ''} onChange={(v) => updateSocial('linkedin', v)} />
-      <div>
-        <label className="block text-sm font-medium mb-1">Tagline</label>
-        <textarea rows="2" value={data.tagline}
-                  onChange={(e) => update('tagline', e.target.value)}
-                  className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-md bg-white dark:bg-neutral-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" />
-      </div>
-      <div>
-        <label className="block text-sm font-medium mb-1">Bio</label>
-        <textarea rows="5" value={data.bio}
-                  onChange={(e) => update('bio', e.target.value)}
-                  className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-md bg-white dark:bg-neutral-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" />
-      </div>
-      <button onClick={download}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-md text-sm font-medium">
-        <Download size={14} /> Download profile.json
+  function reset() {
+    if (!confirm('Discard your unsaved profile changes?')) return
+    setData(profile)
+  }
+
+  const SaveBar = () => (
+    <div className="flex flex-wrap gap-2 items-center p-3 rounded-md bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
+      <button onClick={save}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-md text-sm font-bold">
+        <Save size={16} /> Save Profile (download profile.json)
       </button>
+      {dirty && <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">● unsaved changes</span>}
+      {dirty && (
+        <button onClick={reset} className="text-xs text-neutral-500 hover:text-red-600 ml-auto">
+          Discard changes
+        </button>
+      )}
+    </div>
+  )
+
+  return (
+    <div className="space-y-4 max-w-3xl">
+      <EditWorkflowBanner filePath="src/data/profile.json" fileLabel="profile.json" />
+      <SaveBar />
+
+      <div className="grid sm:grid-cols-2 gap-3 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-5">
+        <Field label="Name" value={data.name} onChange={(v) => update('name', v)} />
+        <Field label="Short name" value={data.shortName} onChange={(v) => update('shortName', v)} />
+        <Field label="Role" value={data.role} onChange={(v) => update('role', v)} />
+        <Field label="Location" value={data.location} onChange={(v) => update('location', v)} />
+        <Field label="Email" value={data.email} onChange={(v) => update('email', v)} />
+        <Field label="CV path" value={data.cv || ''} onChange={(v) => update('cv', v)} />
+        <Field label="GitHub URL" value={data.socials?.github || ''} onChange={(v) => updateSocial('github', v)} />
+        <Field label="LinkedIn URL" value={data.socials?.linkedin || ''} onChange={(v) => updateSocial('linkedin', v)} />
+        <div className="sm:col-span-2">
+          <label className="block text-sm font-medium mb-1">Tagline</label>
+          <textarea rows="2" value={data.tagline}
+                    onChange={(e) => update('tagline', e.target.value)}
+                    className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-md bg-white dark:bg-neutral-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" />
+        </div>
+        <div className="sm:col-span-2">
+          <label className="block text-sm font-medium mb-1">Bio</label>
+          <textarea rows="5" value={data.bio}
+                    onChange={(e) => update('bio', e.target.value)}
+                    className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-md bg-white dark:bg-neutral-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" />
+        </div>
+      </div>
+
+      <SaveBar />
     </div>
   )
 }
