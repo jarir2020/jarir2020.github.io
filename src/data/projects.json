@@ -1,0 +1,74 @@
+[
+  {
+    "id": "unichat",
+    "name": "Unichat",
+    "tagline": "University communications & learning platform",
+    "stack": ["React", "Next.js", "Node", "PostgreSQL", "TailwindCSS"],
+    "url": "https://unichat.ilmino.com/",
+    "repo": null,
+    "type": "private",
+    "image": "/assets/projects/unichat.png",
+    "featured": true,
+    "description": "A platform for university workflows — messaging, course material delivery, and student-facing learning flows. Multi-tenant, role-based access, real-time updates."
+  },
+  {
+    "id": "vertex-bcs",
+    "name": "Vertex for BCS",
+    "tagline": "BCS exam preparation platform — reconstructed",
+    "stack": ["Laravel", "React", "MySQL", "TailwindCSS"],
+    "url": "https://vertex.nextstagesoftware.com/",
+    "repo": null,
+    "type": "private",
+    "image": "/assets/projects/vertex.png",
+    "featured": true,
+    "description": "Reconstructed exam-prep platform for BCS aspirants. Question banks, mock tests with timed scoring, performance analytics, and a content-management backend."
+  },
+  {
+    "id": "universal-spa",
+    "name": "Universal SPA",
+    "tagline": "Drop-in SPA package for Laravel",
+    "stack": ["Laravel", "PHP", "JavaScript", "Composer"],
+    "url": "https://github.com/jarir2020/universal-spa",
+    "repo": "https://github.com/jarir2020/universal-spa",
+    "type": "open-source",
+    "image": "/assets/projects/universal-spa.png",
+    "featured": true,
+    "description": "A Laravel package that gives any Laravel app SPA-style routing & navigation without rewriting the frontend. Designed to be added with one Composer install."
+  },
+  {
+    "id": "pgbrowser",
+    "name": "PGBrowser",
+    "tagline": "PostgreSQL browser in PHP",
+    "stack": ["PHP", "PostgreSQL", "HTML", "CSS"],
+    "url": "https://github.com/jarir2020/PGBrowser",
+    "repo": "https://github.com/jarir2020/PGBrowser",
+    "type": "open-source",
+    "image": "/assets/projects/pgbrowser.png",
+    "featured": false,
+    "description": "A lightweight web UI for browsing PostgreSQL databases. Schema view, table browsing, query runner — single-file PHP, no frameworks."
+  },
+  {
+    "id": "music-station",
+    "name": "Jarir's Music Station",
+    "tagline": "Personal music streaming UI",
+    "stack": ["React", "Vite", "TailwindCSS"],
+    "url": "https://jarir-s-music-station-ruddy.vercel.app/",
+    "repo": null,
+    "type": "open-source",
+    "image": "/assets/projects/music-station.png",
+    "featured": false,
+    "description": "Reconstructed personal music station — playlists, player UI, smooth transitions. Built for the joy of building."
+  },
+  {
+    "id": "pentest-playground",
+    "name": "DVWA Resurrection — Pentest Playground",
+    "tagline": "Vulnerable web app for hands-on pentesting practice",
+    "stack": ["PHP", "MySQL", "Docker"],
+    "url": "https://github.com/jarir2020/Pentest-PlayGround",
+    "repo": "https://github.com/jarir2020/Pentest-PlayGround",
+    "type": "pentest",
+    "image": "/assets/projects/pentest.png",
+    "featured": false,
+    "description": "A reconstructed DVWA-style playground for practicing OWASP Top 10 attacks: SQL injection, XSS, CSRF, command injection, broken auth. Intentionally vulnerable — runs locally for training only."
+  }
+]

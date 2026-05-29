@@ -1,0 +1,15 @@
+[
+  {
+    "id": "current-role",
+    "company": "Self / Freelance",
+    "role": "Full-Stack Developer",
+    "start": "2023",
+    "end": "Present",
+    "stack": ["Laravel", "React", "Node", "Postgres", "MySQL"],
+    "highlights": [
+      "Built and maintain Vertex (BCS exam prep) and Unichat platforms",
+      "Shipped universal-spa Laravel package",
+      "Owner-operator for client projects end-to-end"
+    ]
+  }
+]

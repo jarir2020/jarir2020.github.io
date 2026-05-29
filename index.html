@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <meta name="description" content="Jarir Ahmed — full-stack developer. PHP, Laravel, React, Node, Python. Portfolio, projects, blog." />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Jarir Ahmed — Portfolio" />
+    <meta property="og:description" content="Full-stack developer. Projects, blog, contact." />
+    <meta property="og:url" content="https://jarir2020.github.io" />
+    <meta property="og:image" content="/og-image.png" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Jarir Ahmed — Portfolio" />
+    <meta name="twitter:description" content="Full-stack developer. Projects, blog, contact." />
+    <meta name="twitter:image" content="/og-image.png" />
+
+    <title>Jarir Ahmed — Portfolio</title>
+
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('theme');
+          if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body class="bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100 antialiased">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

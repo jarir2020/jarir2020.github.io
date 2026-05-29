@@ -1,0 +1,42 @@
+[
+  {
+    "id": "laravel-service-classes",
+    "title": "Stop Stuffing Controllers — Service Classes in Laravel",
+    "slug": "laravel-service-classes",
+    "date": "2026-05-20",
+    "excerpt": "Fat controllers are the most common smell in Laravel apps I inherit. A simple service-class pattern unblocks testing, reuse, and queue handlers — without bringing in a heavy architecture book.",
+    "tags": ["laravel", "php", "architecture"]
+  },
+  {
+    "id": "eloquent-n-plus-1",
+    "title": "The Eloquent N+1 Trap That Killed My Page Load",
+    "slug": "eloquent-n-plus-1",
+    "date": "2026-05-15",
+    "excerpt": "A 200ms list page became 8 seconds after a single innocent template change. The fix took two characters. Notes on detecting and killing N+1 queries in Laravel for good.",
+    "tags": ["laravel", "eloquent", "performance"]
+  },
+  {
+    "id": "yii2-gii-productivity",
+    "title": "Why I Still Reach for Yii2 GII for Internal Tools",
+    "slug": "yii2-gii-productivity",
+    "date": "2026-05-08",
+    "excerpt": "Yii2 isn't trendy in 2026 but its GII scaffolder still gets me from \"new requirement\" to \"working admin\" faster than any modern framework for CRUD-heavy back-office tools.",
+    "tags": ["yii2", "php", "productivity"]
+  },
+  {
+    "id": "react-useeffect-traps",
+    "title": "Three useEffect Traps That Bit Me in Production",
+    "slug": "react-useeffect-traps",
+    "date": "2026-04-28",
+    "excerpt": "Stale closures, missing cleanups, and the dep-array lie. Three useEffect bugs that shipped past code review and what I do now to avoid them.",
+    "tags": ["react", "hooks", "javascript"]
+  },
+  {
+    "id": "alpine-laravel-sidekick",
+    "title": "Alpine.js + Blade: The Boring Stack That Ships Fast",
+    "slug": "alpine-laravel-sidekick",
+    "date": "2026-04-18",
+    "excerpt": "Not every Laravel admin needs React, Vue, or Livewire. Alpine.js + Blade gets you 80% of the way with 10KB of JS — and zero build step. When boring is the right answer.",
+    "tags": ["alpine", "laravel", "blade"]
+  }
+]

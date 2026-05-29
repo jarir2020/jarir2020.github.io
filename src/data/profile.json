@@ -1,0 +1,20 @@
+{
+  "name": "Jarir Ahmed",
+  "shortName": "Jarir",
+  "role": "Full-Stack Developer",
+  "tagline": "I build pragmatic web apps with PHP, Laravel, React, and Node — and the occasional Python tool.",
+  "location": "Bangladesh",
+  "email": "jarirahmedcseruet@gmail.com",
+  "cv": "/cv.pdf",
+  "bio": "Full-stack developer focused on shipping useful things. I work across the stack — Laravel APIs, React frontends, Postgres/MySQL, and small Python helpers when needed. I care about clean data flows, fast pages, and code that's easy to come back to.",
+  "socials": {
+    "github": "https://github.com/jarir2020",
+    "linkedin": "https://www.linkedin.com/in/jarir-ahmed-539272155/"
+  },
+  "skills": {
+    "backend": ["PHP", "Laravel", "Node.js", "Python", "REST", "MySQL", "PostgreSQL", "Redis"],
+    "frontend": ["React", "Vite", "Alpine.js", "TailwindCSS", "HTML", "CSS", "JavaScript"],
+    "tools": ["Git", "Docker", "Linux", "Nginx", "GitHub Actions", "Postman"],
+    "security": ["OWASP Top 10", "Pentest fundamentals", "DVWA"]
+  }
+}
