@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react'
 import {
   Lock, Download, FileText, FolderOpen, User as UserIcon, LogOut, Eye,
-  Plus, Pencil, Trash2, ArrowLeft, Copy as CopyIcon, Save
+  Plus, Pencil, Trash2, ArrowLeft, Copy as CopyIcon, Save, ExternalLink,
+  Upload, Image as ImageIcon
 } from 'lucide-react'
 import profile from '../data/profile.json'
 import projects from '../data/projects.json'
 import blog from '../data/blog.json'
 import work from '../data/work.json'
 import { verifyPassword, isAuthed, setAuthed, clearAuth } from '../lib/adminGate.js'
-import { downloadJSON, downloadText } from '../lib/downloader.js'
+import { downloadJSON, downloadText, downloadBlob, fmtSize } from '../lib/downloader.js'
 import { loadPostBody, listPostSlugs } from '../lib/markdown.js'
 
 const TABS = [
@@ -16,6 +17,7 @@ const TABS = [
   { key: 'blog', label: 'Blog', icon: FileText },
   { key: 'projects', label: 'Projects', icon: FolderOpen },
   { key: 'profile', label: 'Profile', icon: UserIcon },
+  { key: 'files', label: 'Files', icon: Upload },
 ]
 
 const PROJECT_TYPES = ['open-source', 'private', 'pentest']
@@ -83,10 +85,16 @@ export default function JarirPanel() {
           <h1 className="font-bold flex items-center gap-2">
             <Lock size={16} className="text-brand-600" /> Jarir Panel
           </h1>
-          <button onClick={onLogout}
-                  className="inline-flex items-center gap-1.5 text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100">
-            <LogOut size={14} /> Lock
-          </button>
+          <div className="flex items-center gap-3">
+            <a href="/" target="_blank" rel="noreferrer noopener"
+               className="inline-flex items-center gap-1.5 text-sm text-brand-600 dark:text-brand-400 hover:underline">
+              <ExternalLink size={14} /> Visit site
+            </a>
+            <button onClick={onLogout}
+                    className="inline-flex items-center gap-1.5 text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100">
+              <LogOut size={14} /> Lock
+            </button>
+          </div>
         </div>
       </header>
 
@@ -111,6 +119,7 @@ export default function JarirPanel() {
         {tab === 'blog' && <BlogTab />}
         {tab === 'projects' && <ProjectsTab />}
         {tab === 'profile' && <ProfileTab />}
+        {tab === 'files' && <FilesTab />}
       </div>
     </div>
   )
@@ -571,6 +580,171 @@ function ProfileTab() {
               className="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-md text-sm font-medium">
         <Download size={14} /> Download profile.json
       </button>
+    </div>
+  )
+}
+
+function FilesTab() {
+  return (
+    <div className="grid lg:grid-cols-2 gap-6">
+      <CvUpdater />
+      <ScreenshotUpdater />
+    </div>
+  )
+}
+
+function CvUpdater() {
+  const [file, setFile] = useState(null)
+  const [error, setError] = useState('')
+
+  function onPick(e) {
+    const f = e.target.files?.[0]
+    setError('')
+    if (!f) { setFile(null); return }
+    if (f.type !== 'application/pdf' && !f.name.toLowerCase().endsWith('.pdf')) {
+      setError('Please select a PDF file.')
+      setFile(null)
+      return
+    }
+    setFile(f)
+  }
+
+  function save() {
+    if (!file) return
+    downloadBlob('cv.pdf', file)
+  }
+
+  return (
+    <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-5 space-y-3">
+      <h3 className="font-bold flex items-center gap-2"><FileText size={16} /> Update CV</h3>
+      <p className="text-xs text-neutral-500">
+        Pick a PDF, click Save — it downloads as <code>cv.pdf</code>. Place it into <code>public/cv.pdf</code> and commit.
+      </p>
+
+      <div className="rounded-md border-2 border-dashed border-neutral-300 dark:border-neutral-700 p-4 text-center">
+        <input id="cv-file" type="file" accept="application/pdf,.pdf" onChange={onPick} className="hidden" />
+        <label htmlFor="cv-file"
+               className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-md text-sm font-medium hover:bg-neutral-100 dark:hover:bg-neutral-800">
+          <Upload size={14} /> Choose PDF
+        </label>
+        {file && (
+          <p className="mt-3 text-sm">
+            <span className="font-medium">{file.name}</span>{' '}
+            <span className="text-neutral-500">({fmtSize(file.size)})</span>
+          </p>
+        )}
+        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      </div>
+
+      <div className="flex gap-2">
+        <button onClick={save} disabled={!file}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 disabled:bg-neutral-400 text-white rounded-md text-sm font-medium">
+          <Save size={14} /> Save as cv.pdf
+        </button>
+        <a href="/cv.pdf" target="_blank" rel="noreferrer noopener"
+           className="inline-flex items-center gap-2 px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-md text-sm font-medium">
+          <ExternalLink size={14} /> View current
+        </a>
+      </div>
+    </div>
+  )
+}
+
+function imagePathFor(project) {
+  if (project.image) return project.image
+  return `/assets/projects/${project.id}.png`
+}
+
+function ScreenshotUpdater() {
+  const [projectId, setProjectId] = useState(projects[0]?.id || '')
+  const [file, setFile] = useState(null)
+  const [error, setError] = useState('')
+  const [previewUrl, setPreviewUrl] = useState('')
+
+  const project = projects.find((p) => p.id === projectId)
+  const targetPath = project ? imagePathFor(project) : ''
+  const targetName = targetPath.split('/').pop() || ''
+  const ext = (file?.name.split('.').pop() || '').toLowerCase()
+  const targetBase = targetName.replace(/\.[^.]+$/, '')
+  const downloadName = file ? `${targetBase}.${ext}` : targetName
+
+  function onPick(e) {
+    const f = e.target.files?.[0]
+    setError('')
+    setPreviewUrl('')
+    if (!f) { setFile(null); return }
+    if (!f.type.startsWith('image/')) {
+      setError('Please select an image file.')
+      setFile(null)
+      return
+    }
+    setFile(f)
+    setPreviewUrl(URL.createObjectURL(f))
+  }
+
+  function save() {
+    if (!file || !project) return
+    downloadBlob(downloadName, file)
+  }
+
+  return (
+    <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-5 space-y-3">
+      <h3 className="font-bold flex items-center gap-2"><ImageIcon size={16} /> Update Project Screenshot</h3>
+      <p className="text-xs text-neutral-500">
+        Select a project, pick an image. Downloads with the correct filename. Place into <code>public/assets/projects/</code> and commit.
+      </p>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Project</label>
+        <select value={projectId} onChange={(e) => setProjectId(e.target.value)}
+                className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-md bg-white dark:bg-neutral-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+          {projects.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+        </select>
+      </div>
+
+      {project && (
+        <p className="text-xs text-neutral-500">
+          Target: <code>public{targetPath}</code>
+        </p>
+      )}
+
+      <div className="rounded-md border-2 border-dashed border-neutral-300 dark:border-neutral-700 p-4 text-center">
+        <input id="shot-file" type="file" accept="image/*" onChange={onPick} className="hidden" />
+        <label htmlFor="shot-file"
+               className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-md text-sm font-medium hover:bg-neutral-100 dark:hover:bg-neutral-800">
+          <Upload size={14} /> Choose image
+        </label>
+        {file && (
+          <div className="mt-3">
+            <p className="text-sm">
+              <span className="font-medium">{file.name}</span>{' '}
+              <span className="text-neutral-500">({fmtSize(file.size)})</span>
+            </p>
+            {previewUrl && (
+              <img src={previewUrl} alt="preview"
+                   className="mt-3 max-h-40 mx-auto rounded border border-neutral-200 dark:border-neutral-800" />
+            )}
+          </div>
+        )}
+        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      </div>
+
+      <div className="flex gap-2">
+        <button onClick={save} disabled={!file || !project}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 disabled:bg-neutral-400 text-white rounded-md text-sm font-medium">
+          <Save size={14} /> Save as {downloadName}
+        </button>
+        {project && project.image && (
+          <a href={project.image} target="_blank" rel="noreferrer noopener"
+             className="inline-flex items-center gap-2 px-4 py-2 border border-neutral-300 dark:border-neutral-700 rounded-md text-sm font-medium">
+            <ExternalLink size={14} /> View current
+          </a>
+        )}
+      </div>
+
+      <p className="text-xs text-neutral-500">
+        Tip: keep screenshots under 200KB. Use WebP for best Lighthouse scores.
+      </p>
     </div>
   )
 }
